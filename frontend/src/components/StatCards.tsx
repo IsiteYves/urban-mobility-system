@@ -38,15 +38,18 @@ export const StatCards: React.FC<StatCardsProps> = ({ stats, loading }) => {
     },
   ];
 
+  const borderRadii = [20, 24, 28, 32];
+
   return (
-    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-      {cards.map((card) => (
+    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-5">
+      {cards.map((card, i) => (
         <div
           key={card.label}
-          className={`stat-card ${loading ? 'opacity-50 pointer-events-none' : ''}`}
+          className={`bg-gradient-to-br from-slate-800/60 to-slate-900/40 border border-slate-700/40 p-6 ${loading ? 'opacity-50' : ''} hover:border-slate-600/60 transition-colors`}
+          style={{borderRadius: borderRadii[i % 4] + 'px'}}
         >
-          <div className={`stat-label text-${card.color}`}>{card.label}</div>
-          <div className="stat-value mt-2">{card.value}</div>
+          <div className="text-xs uppercase tracking-widest font-semibold text-slate-400 mb-3">{card.label}</div>
+          <div className="text-3xl font-bold text-slate-100">{card.value}</div>
         </div>
       ))}
     </div>
