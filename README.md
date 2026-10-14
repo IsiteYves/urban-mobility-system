@@ -8,6 +8,9 @@ We built an enterprise-grade fullstack app (solution) that assists in analyzing 
 - Viola China
 - Esther Konde
 
+## Walkthrough Video
+`Link`: [https://youtu.be/C3fjMtyMROg](https://youtu.be/C3fjMtyMROg)
+
 ## Setup
 
 ### Prerequisites (needed)
@@ -93,7 +96,7 @@ Dashboard: `http://localhost:3000`
 ## Verify
 
 ```bash
-# Check database
+# Check the database
 psql -d nyc_taxi -c "SELECT COUNT(*) FROM trips"
 
 # Check API
