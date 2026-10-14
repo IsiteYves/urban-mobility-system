@@ -9,7 +9,7 @@ We built an Enterprise-grade fullstack application to analyze NYC taxi mobility 
 - Esther Konde
 
 ## Walkthrough Video
-`Link`: [https://youtu.be/C3fjMtyMROg](https://youtu.be/C3fjMtyMROg)
+`Link`: [https://youtu.be/TdFFWYsnfyc](https://youtu.be/TdFFWYsnfyc)
 
 ## Setup
 
