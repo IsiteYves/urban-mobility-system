@@ -1,0 +1,100 @@
+@import url('https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@400;500;600;700&family=Inter:wght@400;500;600;700&display=swap');
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --background: 222 44% 7%;
+    --foreground: 210 30% 96%;
+    --primary: 217 84% 60%;
+    --primary-foreground: 222 47% 8%;
+    --secondary: 43 74% 55%;
+    --secondary-foreground: 26 40% 10%;
+    --card: 222 35% 11%;
+    --card-foreground: 210 30% 96%;
+    --muted: 222 25% 15%;
+    --muted-foreground: 215 15% 68%;
+    --accent: 222 28% 18%;
+    --accent-foreground: 210 30% 96%;
+    --destructive: 0 72% 55%;
+    --destructive-foreground: 210 40% 98%;
+    --warning: 38 92% 50%;
+    --warning-foreground: 26 40% 10%;
+    --success: 158 64% 45%;
+    --success-foreground: 155 40% 10%;
+    --border: 222 20% 20%;
+    --input: 222 20% 18%;
+    --ring: 217 84% 60%;
+    --radius: 0.75rem;
+    --font-bricolage: 'Bricolage Grotesque', sans-serif;
+    --font-inter: 'Inter', sans-serif;
+  }
+
+  .light {
+    color-scheme: light;
+    --background: 210 25% 97%;
+    --foreground: 222 47% 11%;
+    --primary: 218 86% 31%;
+    --primary-foreground: 210 40% 98%;
+    --secondary: 43 74% 49%;
+    --secondary-foreground: 26 40% 12%;
+    --card: 0 0% 100%;
+    --card-foreground: 222 47% 11%;
+    --muted: 210 25% 94%;
+    --muted-foreground: 215 16% 40%;
+    --accent: 210 30% 93%;
+    --accent-foreground: 222 47% 11%;
+    --destructive: 0 72% 46%;
+    --destructive-foreground: 210 40% 98%;
+    --warning: 32 95% 34%;
+    --warning-foreground: 48 96% 96%;
+    --success: 156 72% 28%;
+    --success-foreground: 150 60% 96%;
+    --border: 214 20% 87%;
+    --input: 214 20% 87%;
+    --ring: 218 86% 31%;
+  }
+
+  .dark {
+    color-scheme: dark;
+  }
+
+  html {
+    @apply overflow-x-clip;
+  }
+
+  * {
+    @apply border-border;
+  }
+
+  body {
+    @apply bg-background text-foreground overflow-x-clip antialiased;
+  }
+}
+
+@layer components {
+  .stat-card {
+    @apply bg-card rounded-lg p-5 border border-border shadow-sm;
+  }
+
+  .stat-value {
+    @apply text-3xl font-display font-semibold tracking-tight;
+  }
+
+  .stat-label {
+    @apply text-sm text-muted-foreground font-medium;
+  }
+
+  .data-table {
+    @apply w-full text-sm;
+  }
+
+  .data-table-row {
+    @apply border-b border-border hover:bg-accent/50 transition-colors;
+  }
+
+  .filter-badge {
+    @apply inline-flex items-center gap-1 px-3 py-1 rounded-md bg-primary/10 text-primary text-xs font-medium;
+  }
+}
