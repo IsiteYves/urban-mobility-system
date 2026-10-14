@@ -18,6 +18,17 @@ We built an enterprise-grade fullstack app (solution) that assists in analyzing 
 - Python 3.11+
 - Node.js 18+
 
+### Data Files Required
+Then, download and place these files in project root:
+
+1. **yellow_tripdata_2019-01.csv** (7.6M trips, ~687MB)
+   - [Download here](https://alueducation.instructure.com/courses/3138/files/581082/download?download_frd=1)
+   - Save as: `yellow_tripdata_2019-01.csv` (in project root)
+   - Contains: Raw taxi trip data (pickup/dropoff times, locations, fares, passengers)
+   
+2. **taxi_zone_lookup.csv** (included in repository)
+   - Already present in root directory
+
 ### 1. PostgreSQL Database
 
 ```bash
@@ -27,13 +38,13 @@ brew services start postgresql
 # Create the database
 createdb nyc_taxi
 
-# Load schema
+# Load the database schema
 psql -d nyc_taxi < backend/db/schema.sql
 
 # Insert vendors
 psql -d nyc_taxi -c "INSERT INTO vendors VALUES (1, 'Creative Mobile Technologies'), (2, 'VeriFone Inc')"
 
-# Load zones from CSV (265 zones)
+# Load zones from taxi_zone_lookup.csv (265 zones)
 python3 << 'EOF'
 import psycopg2
 import csv
@@ -70,12 +81,17 @@ EOF
 ### 3. Data Processing
 
 ```bash
-# Install Python dependencies
+# Install Python dependencies of this project
 pip3 install -r backend/requirements.txt
 
-# Process trip data (7.6M records → 5.4M valid, ~100 min)
+# Process trip data: validates, cleans, engineers features, loads to database
+# The input is: yellow_tripdata_2019-01.csv (7.6M records)
+# The output: 5.4M valid trips in database (71.49% pass validation)
+# Runtime: ~100 minutes | RAM: ~800MB
 python3 backend/scripts/data_processor.py
 ```
+
+**What this does**: It chunks CSV, validates temporal/numeric/categorical data, engineers 3 features (speed_mph, fare_per_mile, profitability_ratio), detects anomalies, batch inserts to PostgreSQL. Rejects records with fare mismatches, invalid zones, out-of-range dates.
 
 ## Launch
 
@@ -96,12 +112,13 @@ Dashboard: `http://localhost:3000`
 ## Verify
 
 ```bash
-# Check the database
+# After data processing is completed:
 psql -d nyc_taxi -c "SELECT COUNT(*) FROM trips"
+# What to expect: ~5.4M records (if processing finished)
 
-# Check API
+# Check API health
 curl http://localhost:5001/api/health
 
-# Check the running app
-# Open http://localhost:3000 in any of your installed browsers
+# Check the dashboard at http://localhost:3000 in any of your PC's browsers
+# It should show: around 5.4M trips, stat cards with fares/speed, hourly chart
 ```
