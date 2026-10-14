@@ -1,9 +1,9 @@
-# Team 1 NYC Taxi Mobility Analytics Platform
+# Team 1 | New York City Taxi Mobility Analytics Setup
 
-We built an enterprise-grade fullstack app (solution) that assists in analyzing urban mobility patterns in NYC taxi data.
+We built an Enterprise-grade fullstack application to analyze NYC taxi mobility patterns. Our application processes 7.6M trips (Jan 2019) to extract 5.4M valid insights.
 
 ## Team
-- Yves Isite
+- Yves Isite,
 - Memory Chungulo
 - Viola China
 - Esther Konde
@@ -13,112 +13,73 @@ We built an enterprise-grade fullstack app (solution) that assists in analyzing 
 
 ## Setup
 
-### Prerequisites (needed)
-- PostgreSQL 14+
-- Python 3.11+
-- Node.js 18+
+**Needed prerequisites:** Python 3.11+, Node.js 18+
 
-### Data Files Required
-Then, download and place these files in project root:
-
-1. **yellow_tripdata_2019-01.csv** (7.6M trips, ~687MB)
-   - [Download here](https://alueducation.instructure.com/courses/3138/files/581082/download?download_frd=1)
-   - Save as: `yellow_tripdata_2019-01.csv` (in project root)
-   - Contains: Raw taxi trip data (pickup/dropoff times, locations, fares, passengers)
-   
-2. **taxi_zone_lookup.csv** (included in repository)
-   - Already present in root directory
-
-### 1. PostgreSQL Database
+### Quick testing (using SQLite for the demo)
 
 ```bash
-# Start PostgreSQL
-brew services start postgresql
-
-# Create the database
-createdb nyc_taxi
-
-# Load the database schema
-psql -d nyc_taxi < backend/db/schema.sql
-
-# Insert vendors
-psql -d nyc_taxi -c "INSERT INTO vendors VALUES (1, 'Creative Mobile Technologies'), (2, 'VeriFone Inc')"
-
-# Load zones from taxi_zone_lookup.csv (265 zones)
-python3 << 'EOF'
-import psycopg2
-import csv
-
-conn = psycopg2.connect("dbname=nyc_taxi")
-cursor = conn.cursor()
-
-with open('taxi_zone_lookup.csv', 'r') as f:
-    for row in csv.DictReader(f):
-        cursor.execute(
-            "INSERT INTO taxi_zones (location_id, borough, zone, service_zone) VALUES (%s, %s, %s, %s) ON CONFLICT DO NOTHING",
-            (int(row['LocationID']), row['Borough'], row['Zone'], row['service_zone'])
-        )
-
-conn.commit()
-conn.close()
-print("✓ Zones loaded")
-EOF
-```
-
-### 2. Environment Configuration
-
-```bash
-# Create .env file
-cat > .env << 'EOF'
-DATABASE_URL=postgresql://localhost/nyc_taxi
-FLASK_ENV=development
-FLASK_DEBUG=True
-CORS_ORIGINS=http://localhost:3000,http://localhost:5001
-NEXT_PUBLIC_API_URL=http://localhost:5001/api
-EOF
-```
-
-### 3. Data Processing
-
-```bash
-# Install Python dependencies of this project
+# 1. Install dependencies
 pip3 install -r backend/requirements.txt
 
-# Process trip data: validates, cleans, engineers features, loads to database
-# The input is: yellow_tripdata_2019-01.csv (7.6M records)
-# The output: 5.4M valid trips in database (71.49% pass validation)
-# Runtime: ~100 minutes | RAM: ~800MB
-python3 backend/scripts/data_processor.py
-```
+# 2. Generate & load the 500k sample trips
+python3 backend/scripts/generate_sample_data.py
+python3 backend/scripts/setup_sqlite.py
 
-**What this does**: It chunks CSV, validates temporal/numeric/categorical data, engineers 3 features (speed_mph, fare_per_mile, profitability_ratio), detects anomalies, batch inserts to PostgreSQL. Rejects records with fare mismatches, invalid zones, out-of-range dates.
-
-## Launch
-
-### Backend (Terminal 1)
-```bash
+# 3. Start backend (Terminal 1)
 python3 backend/src/app.py
-```
-API runs at `http://localhost:5001/api` (ensure port 5001 is free)
 
-### Frontend (Terminal 2)
-```bash
-cd frontend
-npm install
-npm run dev
+# 4. Start frontend (Terminal 2)
+cd frontend && npm install && npm run dev
 ```
-Dashboard: `http://localhost:3000`
+
+Dashboard: **http://localhost:3001**
+
+Database: `nyc_taxi.db` auto-created with 500k representative sample trips (realistic patterns, fast setup).
+
+---
+
+### Full Dataset Setup - Option A: for SQLite
+
+Use real 7.6M trip CSV for complete analysis in SQLite:
+
+## 1. Download real data
+     Place yellow_tripdata_2019-01.csv in project root
+## [Download](https://alueducation.instructure.com/courses/3138/files/581082/download?download_frd=1)
+
+## 2. Load into SQLite
+python3 backend/scripts/setup_sqlite.py
+
+## 3. Start servers (same as above)
+
+**The result is**: approximately 5.4M valid trips loaded (71.49% pass validation). Slower queries but no database server needed.
+
+---
+
+### Full Dataset Setup - Option B: with PostgreSQL (+ server setup)
+
+For production or demanding queries:
+
+```bash
+# 1. Set PostgreSQL connection
+export DATABASE_URL="postgresql://user:pass@localhost/nyc_taxi"
+
+# 2. Download & load real data
+# Place yellow_tripdata_2019-01.csv in project root
+python3 backend/scripts/setup_sqlite.py  # Auto-detects PostgreSQL via env var
+
+# 3. Start servers (same as above)
+```
+
+**Result**: ~5.4M valid trips. Fast queries, requires PostgreSQL server.
+
+---
 
 ## Verify
 
 ```bash
-# After data processing is completed:
-psql -d nyc_taxi -c "SELECT COUNT(*) FROM trips"
-# What to expect: ~5.4M records (if processing finished)
-
 # Check API health
 curl http://localhost:5001/api/health
 
-# Check the dashboard at http://localhost:3000 in any of your PC's browsers
-# It should show: around 5.4M trips, stat cards with fares/speed, hourly chart
+# Check the database
+ls -lh nyc_taxi.db
 ```
