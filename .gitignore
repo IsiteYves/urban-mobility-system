@@ -53,3 +53,5 @@ lerna-debug.log*
 # temporary files
 /tmp/
 *.tmp
+# Local database (too large for GitHub)
+nyc_taxi.db
